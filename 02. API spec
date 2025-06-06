@@ -1,0 +1,153 @@
+4. API 명세
+모든 API 요청과 응답의 본문(Body)은 application/json 형식을 따릅니다.
+
+4.1. POST /api/identify
+설명: 사용자를 식별하고 온보딩 참여 자격을 검증합니다. 첫 참여 시 상태를 초기화하고 즉시 보상을 지급합니다.
+요청 (Request Body)
+JSON
+
+{
+  "nickname": "peter-a4t7"
+}
+응답 (Success Response, 200 OK)
+JSON
+
+{
+  "valid": true,
+  "userId": "peter-a4t7",
+  "is_new": true,       // 첫 참여 여부
+  "points": 50,         // 초기 지급 포인트
+  "stage_state": 1      // 현재 단계 (1: 설문)
+}
+응답 (Error Response)
+자격 없는 닉네임: 403 Forbidden
+JSON
+
+{"detail": "참여 자격이 없는 사용자입니다."}
+4.2. POST /api/survey
+설명: 사용자의 설문 답변을 제출받고, 문항에 따른 랜덤 포인트를 지급합니다.
+요청 (Request Body)
+JSON
+
+{
+  "userId": "peter-a4t7",
+  "questionId": 1,
+  "response": "앱이 너무 복잡해서요."
+}
+응답 (Success Response, 200 OK)
+JSON
+
+{
+  "points_awarded": 18,     // 이번에 지급된 포인트 (랜덤)
+  "total_points": 68,       // 누적 총 포인트
+  "next_stage": false       // 설문 완료 여부
+}
+마지막 문항 제출 시 next_stage는 true가 됩니다.
+응답 (Error Response)
+잘못된 순서의 요청: 400 Bad Request
+JSON
+
+{"detail": "잘못된 설문 순서입니다."}
+4.3. POST /api/cardview
+설명: 사용자가 본 카드뉴스 인덱스를 기록하고 포인트를 지급합니다.
+요청 (Request Body)
+JSON
+
+{
+  "userId": "peter-a4t7",
+  "cardIndex": 2
+}
+응답 (Success Response, 200 OK)
+JSON
+
+{
+  "points_awarded": 5,
+  "total_points": 125
+}
+cardIndex가 4일 경우, points_awarded는 20이 됩니다.
+응답 (Error Response)
+이미 처리된 인덱스: 200 OK (에러 대신 0점 지급)
+JSON
+
+{"points_awarded": 0, "total_points": 125}
+4.4. POST /api/video
+설명: 영상 시청 진행률(중간/완료)을 기록하고 포인트를 지급합니다.
+요청 (Request Body)
+JSON
+
+{
+  "userId": "peter-a4t7",
+  "progress": 50 // 50(중간) 또는 100(완료)
+}
+응답 (Success Response, 200 OK)
+JSON
+
+{
+  "points_awarded": 10, // 50%일 때 10, 100%일 때 50
+  "total_points": 135
+}
+4.5. POST /api/spend
+설명: 사용자의 결제액을 누적하고, 달성한 챌린지 목표에 따라 보상을 지급합니다.
+요청 (Request Body)
+JSON
+
+{
+  "userId": "peter-a4t7",
+  "amount": 50000
+}
+응답 (Success Response, 200 OK)
+JSON
+
+{
+  "points_awarded": 200,
+  "coupon_awarded": "DISCOUNT5%", // 지급된 쿠폰 (없으면 null)
+  "total_spend": 50000,
+  "total_points": 500
+}
+4.6. GET /api/status
+설명: 페이지 새로고침 시, 사용자의 현재 상태 전체를 조회합니다.
+요청 (Query Parameter): /api/status?nickname=peter-a4t7
+응답 (Success Response, 200 OK)
+JSON
+
+{
+  "valid": true,
+  "userId": "peter-a4t7",
+  "points": 500,
+  "stage_state": 5, // 현재 진행중인 단계
+  "survey_step": 3,
+  "card_index": 4,
+  "video_progress": 100,
+  "spend_amount": 50000
+}
+4.7. GET /api/stats
+설명: '사회적 증거'를 표시하기 위한 전역 통계 데이터를 조회합니다.
+요청: /api/stats (파라미터 없음)
+응답 (Success Response, 200 OK)
+JSON
+
+{
+  "total_participants": 152,  // 총 참여자 수
+  "avg_points_survey": 75,    // 설문 평균 획득 포인트
+  "video_viewers_percent": 90 // 카드뉴스 조회자 중 영상 시청자 비율
+}
+5. 데이터 모델 (Replit DB)
+Replit DB는 Key-Value 스토어이며, 아래와 같은 구조로 데이터를 관리합니다.
+
+5.1. Global Keys (전역 데이터)
+Key	자료형	설명	예시
+allowed_users	Tuple	참여 자격이 있는 사용자 닉네임 목록	("peter-a4t7", "joy-b5g8")
+global_stats	Dictionary	사회적 증거용 전역 통계	{"participants": 152, ...}
+
+Sheets로 내보내기
+5.2. User-Specific Keys (사용자별 데이터)
+{nickname} 부분에는 실제 사용자 userId가 들어갑니다. (예: user:peter-a4t7:points)
+Key	자료형	설명	예시
+user:{nickname}:valid	String	온보딩 참여 여부. "1"이면 참여.	"1"
+user:{nickname}:points	Integer	누적 포인트	500
+user:{nickname}:stage_state	Integer	현재 사용자가 위치한 단계 (0~5)	5
+user:{nickname}:survey_step	Integer	완료한 설문 문항 수	3
+user:{nickname}:card_index	Integer	조회 완료한 카드뉴스 인덱스	4
+user:{nickname}:video_progress	Integer	영상 시청 진행도 (0, 50, 100)	100
+user:{nickname}:spend_amount	Integer	누적 결제액	50000
+user:{nickname}:spend_tier	Integer	달성 완료한 결제 챌린지 단계	1 (5만원 단계)

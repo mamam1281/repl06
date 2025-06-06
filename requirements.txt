@@ -1,0 +1,6 @@
+# FastAPI 웹 프레임워크
+fastapi==0.111.0
+
+# ASGI 서버 (uvicorn)
+# [standard]는 성능 향상을 위한 추가 라이브러리를 포함합니다.
+uvicorn[standard]==0.30.1

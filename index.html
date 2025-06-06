@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>온보딩 & 결제 챌린지</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+    <section id="section-nickname" class="min-h-screen">
+        <div class="container">
+            <h1 class="title">닉네임을 입력하면<br>오늘의 첫 보상이 시작됩니다! 🎁</h1>
+            <input id="nickname-input" class="input-form" type="text" placeholder="닉네임">
+            <button id="btn-start" class="button-primary">시작하기</button>
+            <p class="sub-text">이미 인증된 코드회원만 참여 가능</p>
+        </div>
+    </section>
+
+    <section id="section-survey" class="min-h-screen hidden">
+        <div class="container">
+            <h2 class="title">STEP 1: 짧은 설문</h2>
+            <div id="survey-container" class="space-y-4">
+                <p>설문 섹션입니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
