@@ -1,19 +1,17 @@
-modules = ["python-3.11"]
-[nix]
-channel = "stable-24_05"
-packages = ["libxcrypt"]
+# pyproject.toml
 
-[workflows]
-runButton = "Run Server"
+[tool.poetry]
+name = "onboarding-challenge"
+version = "0.1.0"
+description = "경량 온보딩 및 점진 누적 결제 유도 프로젝트"
+authors = ["Tele-Chatbot <chatbot@example.com>"]
+readme = "README.md"
 
-[[workflows.workflow]]
-name = "Run Server"
-author = 43226313
-mode = "sequential"
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.1"}
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "poetry run uvicorn main:app --host 0.0.0.0 --port 5000 --reload"
-
-[deployment]
-run = ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 5000"]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
