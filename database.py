@@ -37,5 +37,4 @@ def delete(key):
         del _db[key]
         save_db()
         return True
-    return Falsef exists(key):
-    return key in _db
+    return False  # Corrected this line

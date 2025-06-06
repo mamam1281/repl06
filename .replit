@@ -29,5 +29,13 @@ mode = "sequential"
 task = "shell.exec"
 args = "uvicorn main:app --host 0.0.0.0 --port 5000 --reload"
 
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python setup_db.py"
+
 [nix]
 packages = ["libxcrypt"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80

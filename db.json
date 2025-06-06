@@ -1,0 +1,13 @@
+{
+    "allowed_users": [
+        "peter-a4t7",
+        "joy-b5g8",
+        "chris-c9h1"
+    ],
+    "global_stats": {
+        "participants": 0,
+        "total_points_awarded": 0,
+        "video_viewers": 0,
+        "card_finishers": 0
+    }
+}
