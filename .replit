@@ -1,3 +1,4 @@
+modules = ["python-3.11"]
 # pyproject.toml
 
 [tool.poetry]
@@ -15,3 +16,18 @@ uvicorn = {extras = ["standard"], version = "^0.30.1"}
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[workflows]
+runButton = "Run FastAPI Server"
+
+[[workflows.workflow]]
+name = "Run FastAPI Server"
+author = 43226313
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 5000 --reload"
+
+[nix]
+packages = ["libxcrypt"]

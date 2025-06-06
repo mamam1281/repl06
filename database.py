@@ -31,3 +31,11 @@ def set(key, value):
 
 def exists(key):
     return key in _db
+
+def delete(key):
+    if key in _db:
+        del _db[key]
+        save_db()
+        return True
+    return Falsef exists(key):
+    return key in _db
