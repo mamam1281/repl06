@@ -1,2 +1,18 @@
 [nix]
 channel = "stable-24_05"
+packages = ["libxcrypt"]
+
+[workflows]
+runButton = "Run Server"
+
+[[workflows.workflow]]
+name = "Run Server"
+author = 43226313
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 5000 --reload"
+
+[deployment]
+run = ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 5000"]
