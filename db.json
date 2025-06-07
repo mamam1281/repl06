@@ -2,7 +2,11 @@
     "allowed_users": [
         "peter-a4t7",
         "joy-b5g8",
-        "chris-c9h1"
+        "chris-c9h1",
+        "tester-01"
+    ],
+    "test_users": [
+        "tester-01"
     ],
     "global_stats": {
         "participants": 1,
@@ -10,12 +14,29 @@
         "video_viewers": 0,
         "card_finishers": 0
     },
-    "user:peter-a4t7:valid": "1",
-    "user:peter-a4t7:points": 50,
-    "user:peter-a4t7:stage_state": 1,
-    "user:peter-a4t7:survey_step": 0,
-    "user:peter-a4t7:card_index": 0,
-    "user:peter-a4t7:video_progress": 0,
-    "user:peter-a4t7:spend_amount": 0,
-    "user:peter-a4t7:spend_tier": 0
+    "user:tester-01:valid": "1",
+    "user:tester-01:points": 176735,
+    "user:tester-01:progression_day": 7,
+    "user:tester-01:survey_step": 3,
+    "user:tester-01:viewed_cards": [
+        3,
+        4,
+        5,
+        6
+    ],
+    "user:tester-01:video_progress": 100,
+    "user:tester-01:payment_log": {
+        "day_8": 150000,
+        "day_9": 100000,
+        "day_10": 50000,
+        "day_12": 100000,
+        "day_13": 100000,
+        "day_14": 100000
+    },
+    "user:tester-01:survey_responses": {
+        "question_1": "\uc785\uae08",
+        "question_2": "\uc785\uae08",
+        "question_3": "\uc785\uae08"
+    },
+    "user:tester-01:last_activity_date": "2025-06-07T13:18:16.740994+00:00"
 }

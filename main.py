@@ -1,9 +1,10 @@
 # main.py
+
 import os
 import re
 import random
 from contextlib import asynccontextmanager
-# ✅ 올바른 코드
+from datetime import datetime, date, timezone
 from fastapi import FastAPI, HTTPException, Request
 from starlette.responses import FileResponse
 from pydantic import BaseModel
@@ -33,7 +34,7 @@ class SurveyRequest(BaseModel):
 
 class CardViewRequest(BaseModel):
     userId: str
-    cardIndex: int
+    day: int
 
 
 class VideoRequest(BaseModel):
@@ -43,35 +44,9 @@ class VideoRequest(BaseModel):
 
 class SpendRequest(BaseModel):
     userId: str
+    day: int
     amount: int
 
-
-# --- 보상 설정 ---
-REWARD_TIERS = [{
-    "threshold": 400000,
-    "points": 1500,
-    "tier": 6
-}, {
-    "threshold": 300000,
-    "points": 2000,
-    "tier": 5
-}, {
-    "threshold": 200000,
-    "points": 1500,
-    "tier": 4
-}, {
-    "threshold": 150000,
-    "points": 1000,
-    "tier": 3
-}, {
-    "threshold": 100000,
-    "points": 500,
-    "tier": 2
-}, {
-    "threshold": 50000,
-    "points": 200,
-    "tier": 1
-}]
 
 # ===================================================================
 # === API 엔드포인트 ===
@@ -85,47 +60,89 @@ async def identify(req: IdentifyRequest):
         raise HTTPException(status_code=400, detail="닉네임 형식 오류")
     if nickname not in db.get("allowed_users", []):
         raise HTTPException(status_code=403, detail="참여 자격 없음")
-    if db.exists(f"user:{nickname}:valid"):
-        raise HTTPException(status_code=400, detail="이미 참여함")
 
+    is_test_user = nickname in db.get("test_users", [])
+
+    if db.exists(f"user:{nickname}:valid"):  # 재방문 사용자
+        last_activity_str = db.get(f"user:{nickname}:last_activity_date")
+        progression_day = db.get(f"user:{nickname}:progression_day", 1)
+
+        if last_activity_str and not is_test_user:
+            last_activity_date = datetime.fromisoformat(
+                last_activity_str).date()
+            today = datetime.now(timezone.utc).date()
+            if today > last_activity_date:
+                progression_day += 1
+                db.set(f"user:{nickname}:progression_day", progression_day)
+
+        return {
+            "valid": True,
+            "userId": nickname,
+            "is_new": False,
+            "points": db.get(f"user:{nickname}:points", 0),
+            "progression_day": progression_day,
+            "is_test_user": is_test_user
+        }
+
+    # 신규 사용자 초기화
     db.set(f"user:{nickname}:valid", "1")
-    db.set(f"user:{nickname}:points", 50)
-    db.set(f"user:{nickname}:stage_state", 1)
+    db.set(f"user:{nickname}:points", 5000)
+    db.set(f"user:{nickname}:progression_day", 1)
     db.set(f"user:{nickname}:survey_step", 0)
-    db.set(f"user:{nickname}:card_index", 0)
+    db.set(f"user:{nickname}:viewed_cards", [])
     db.set(f"user:{nickname}:video_progress", 0)
-    db.set(f"user:{nickname}:spend_amount", 0)
-    db.set(f"user:{nickname}:spend_tier", 0)
+    db.set(f"user:{nickname}:payment_log", {})
+
     stats = db.get("global_stats", {})
     stats["participants"] = stats.get("participants", 0) + 1
     db.set("global_stats", stats)
+
     return {
         "valid": True,
         "userId": nickname,
         "is_new": True,
-        "points": 50,
-        "stage_state": 1
+        "points": 5000,
+        "progression_day": 1,
+        "is_test_user": is_test_user
     }
+
+
+def record_mission_completion(nickname: str):
+    db.set(f"user:{nickname}:last_activity_date",
+           datetime.now(timezone.utc).isoformat())
 
 
 @app.post("/api/survey")
 async def survey(req: SurveyRequest):
     nickname = req.userId
     question_id = req.questionId
+
     if not db.exists(f"user:{nickname}:valid"):
         raise HTTPException(status_code=403, detail="미인증 사용자")
+
+    progression_day = db.get(f"user:{nickname}:progression_day", 0)
+    if progression_day != 2:
+        raise HTTPException(status_code=400, detail="설문은 2일차에만 진행할 수 있습니다.")
+
     current_step = db.get(f"user:{nickname}:survey_step", 0)
     if current_step != question_id - 1:
         raise HTTPException(status_code=400, detail="잘못된 설문 순서")
 
-    points_awarded = random.randint(10, 20)
+    survey_log_key = f"user:{nickname}:survey_responses"
+    survey_log = db.get(survey_log_key, {})
+    survey_log[f"question_{question_id}"] = req.response
+    db.set(survey_log_key, survey_log)
+
+    points_awarded = 0
     is_final_question = (question_id == 3)
-    if is_final_question: points_awarded += random.randint(20, 50)
+    if is_final_question:
+        points_awarded = random.choice([3000, 5000, 10000]) + 5000
+        record_mission_completion(req.userId)
 
     total_points = db.get(f"user:{nickname}:points", 0) + points_awarded
     db.set(f"user:{nickname}:points", total_points)
     db.set(f"user:{nickname}:survey_step", current_step + 1)
-    if is_final_question: db.set(f"user:{nickname}:stage_state", 2)
+
     return {
         "points_awarded": points_awarded,
         "total_points": total_points,
@@ -136,62 +153,126 @@ async def survey(req: SurveyRequest):
 @app.post("/api/cardview")
 async def cardview(req: CardViewRequest):
     nickname = req.userId
-    saved_idx = db.get(f"user:{nickname}:card_index", 0)
-    if req.cardIndex <= saved_idx:
+    if not db.exists(f"user:{nickname}:valid"):
+        raise HTTPException(status_code=403, detail="미인증 사용자")
+
+    progression_day = db.get(f"user:{nickname}:progression_day", 0)
+
+    if not (3 <= req.day <= 6) or req.day > progression_day:
+        raise HTTPException(status_code=403, detail="아직 열람할 수 없는 카드입니다.")
+
+    viewed_cards = db.get(f"user:{nickname}:viewed_cards", [])
+    if req.day in viewed_cards:
         return {
             "points_awarded": 0,
             "total_points": db.get(f"user:{nickname}:points", 0)
         }
-    points = 5 if req.cardIndex < 4 else 20
-    db.set(f"user:{nickname}:card_index", req.cardIndex)
-    total_points = db.get(f"user:{nickname}:points", 0) + points
+
+    points_awarded = 5000
+    total_points = db.get(f"user:{nickname}:points", 0) + points_awarded
     db.set(f"user:{nickname}:points", total_points)
-    if req.cardIndex == 4: db.set(f"user:{nickname}:stage_state", 3)
-    return {"points_awarded": points, "total_points": total_points}
+
+    viewed_cards.append(req.day)
+    db.set(f"user:{nickname}:viewed_cards", viewed_cards)
+    record_mission_completion(req.userId)
+
+    return {"points_awarded": points_awarded, "total_points": total_points}
 
 
 @app.post("/api/video")
 async def video(req: VideoRequest):
     nickname = req.userId
+    if not db.exists(f"user:{nickname}:valid"):
+        raise HTTPException(status_code=403, detail="미인증 사용자")
+
+    progression_day = db.get(f"user:{nickname}:progression_day", 0)
+    if progression_day != 7:
+        raise HTTPException(status_code=400, detail="영상 시청은 7일차에만 진행할 수 있습니다.")
+
     saved_progress = db.get(f"user:{nickname}:video_progress", 0)
     if req.progress <= saved_progress:
         return {
             "points_awarded": 0,
             "total_points": db.get(f"user:{nickname}:points", 0)
         }
-    points = 10 if req.progress == 50 else 50
+
+    points = 5000 if req.progress == 50 else 10000
+
     db.set(f"user:{nickname}:video_progress", req.progress)
     total_points = db.get(f"user:{nickname}:points", 0) + points
     db.set(f"user:{nickname}:points", total_points)
-    if req.progress == 100: db.set(f"user:{nickname}:stage_state", 4)
+
+    if req.progress == 100:
+        record_mission_completion(req.userId)
+
     return {"points_awarded": points, "total_points": total_points}
 
 
 @app.post("/api/spend")
 async def spend(req: SpendRequest):
     nickname = req.userId
-    total_spend = db.get(f"user:{nickname}:spend_amount", 0) + req.amount
-    db.set(f"user:{nickname}:spend_amount", total_spend)
-    current_tier = db.get(f"user:{nickname}:spend_tier", 0)
-    points_to_add = 0
-    for tier_info in REWARD_TIERS:
-        if total_spend >= tier_info["threshold"] and current_tier < tier_info[
-                "tier"]:
-            points_to_add = tier_info["points"]
-            db.set(f"user:{nickname}:spend_tier", tier_info["tier"])
-            break
+    if not db.exists(f"user:{nickname}:valid"):
+        raise HTTPException(status_code=403, detail="미인증 사용자")
+
+    progression_day = db.get(f"user:{nickname}:progression_day", 0)
+    if req.day != progression_day or not (8 <= req.day <= 14):
+        raise HTTPException(status_code=400, detail="오늘의 결제 챌린지가 아닙니다.")
+
+    log_key = f"user:{nickname}:payment_log"
+    payment_log = db.get(log_key, {})
+    payment_log[f"day_{req.day}"] = req.amount
+    db.set(log_key, payment_log)
+
+    points_awarded = 0
+    special_reward = None
+
+    if req.day in [8, 9, 10]:
+        points_awarded = random.choice([5000, 15000, 20000, 30000])
+
+    if req.day in [11, 12, 13] and req.amount >= 100000:
+        points_awarded = random.randint(5000, 20000)
+
+    if req.day == 14 and req.amount >= 100000:
+        special_reward = "배민 상품권 3만원권"
+
     total_points = db.get(f"user:{nickname}:points", 0)
-    if points_to_add > 0:
-        total_points += points_to_add
+    if points_awarded > 0:
+        total_points += points_awarded
         db.set(f"user:{nickname}:points", total_points)
+
+    record_mission_completion(req.userId)
+
     return {
-        "points_awarded": points_to_add,
-        "total_spend": total_spend,
+        "message": "결제 활동이 성공적으로 기록되었습니다. 관리자 확인 후 보상이 지급됩니다.",
+        "points_awarded": points_awarded,
+        "special_reward": special_reward,
         "total_points": total_points
     }
 
 
-# --- 웹페이지 및 정적 파일 제공 ---
+@app.post("/api/nextday")
+async def next_day(req: Request):
+    body = await req.json()
+    nickname = body.get("userId")
+
+    if not db.exists(f"user:{nickname}:valid"):
+        raise HTTPException(status_code=403, detail="미인증 사용자")
+
+    if nickname not in db.get("test_users", []):
+        raise HTTPException(status_code=403, detail="테스트 유저만 사용할 수 있는 기능입니다.")
+
+    current_day = db.get(f"user:{nickname}:progression_day", 1)
+
+    # [수정] 14일차를 넘으면 2일차로 리셋 (무한 테스트)
+    new_day = current_day + 1
+    if new_day > 14:
+        new_day = 2
+
+    db.set(f"user:{nickname}:progression_day", new_day)
+
+    return {"new_day": new_day}
+
+
 @app.get("/{path:path}")
 async def serve_static_or_index(path: str):
     file_path = os.path.join(".", path)

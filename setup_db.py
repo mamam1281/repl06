@@ -9,8 +9,11 @@ initial_data = {
     "allowed_users": [
         "peter-a4t7",
         "joy-b5g8",
-        "chris-c9h1"
+        "chris-c9h1",
+        "tester-01"  # 테스트 유저도 참여 자격이 있어야 합니다.
     ],
+    # [추가] 테스트 유저 목록
+    "test_users": ["tester-01"],
     # 2. '사회적 증거'를 위한 전역 통계 데이터 초기화
     "global_stats": {
         "participants": 0,
@@ -26,4 +29,5 @@ with open(DB_FILE, "w") as f:
 
 print(f"✅ '{DB_FILE}' 파일이 성공적으로 생성되었습니다.")
 print(f"허용된 사용자: {initial_data['allowed_users']}")
+print(f"테스트 사용자: {initial_data['test_users']}")
 print(f"초기 통계: {initial_data['global_stats']}")
