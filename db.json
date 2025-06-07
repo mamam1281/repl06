@@ -5,9 +5,17 @@
         "chris-c9h1"
     ],
     "global_stats": {
-        "participants": 0,
+        "participants": 1,
         "total_points_awarded": 0,
         "video_viewers": 0,
         "card_finishers": 0
-    }
+    },
+    "user:peter-a4t7:valid": "1",
+    "user:peter-a4t7:points": 50,
+    "user:peter-a4t7:stage_state": 1,
+    "user:peter-a4t7:survey_step": 0,
+    "user:peter-a4t7:card_index": 0,
+    "user:peter-a4t7:video_progress": 0,
+    "user:peter-a4t7:spend_amount": 0,
+    "user:peter-a4t7:spend_tier": 0
 }

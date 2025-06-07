@@ -3,29 +3,83 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>온보딩 & 결제 챌린지</title>
+    <title>Onboarding Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-    <section id="section-nickname" class="min-h-screen">
-        <div class="container">
-            <h1 class="title">닉네임을 입력하면<br>오늘의 첫 보상이 시작됩니다! 🎁</h1>
-            <input id="nickname-input" class="input-form" type="text" placeholder="닉네임">
-            <button id="btn-start" class="button-primary">시작하기</button>
-            <p class="sub-text">이미 인증된 코드회원만 참여 가능</p>
-        </div>
-    </section>
+    <div class="page-container">
+        <main class="main-grid">
 
-    <section id="section-survey" class="min-h-screen hidden">
-        <div class="container">
-            <h2 class="title">STEP 1: 짧은 설문</h2>
-            <div id="survey-container" class="space-y-4">
-                <p>설문 섹션입니다.</p>
+            <div class="app-container">
+                <section id="section-nickname">
+                    <h1 class="app-title">Discover the power of design</h1>
+                    <p class="app-description">Enter your code to start the journey and unlock exclusive rewards.</p>
+                    <div class="input-group">
+                        <input id="nickname-input" class="input-form" type="text" placeholder="Enter your code">
+                        <button id="btn-start" class="button-primary">Start Now</button>
+                    </div>
+                </section>
+
+                <section id="section-survey" class="hidden">
+                     <h2 class="app-title">STEP 1: Short Survey</h2>
+                     <div id="survey-container"></div>
+                </section>
+
+                <section id="section-cardnews" class="hidden">
+                    <h2 class="app-title">STEP 2: Card News</h2>
+                    <p class="app-description">Swipe through the cards to learn more and earn points.</p>
+                    <div id="card-slider" class="card-slider">
+                        <img src="https://via.placeholder.com/256x160/555/fff?text=Card+1" alt="Card 1" class="card-image">
+                        <img src="https://via.placeholder.com/256x160/666/fff?text=Card+2" alt="Card 2" class="card-image">
+                        <img src="https://via.placeholder.com/256x160/777/fff?text=Card+3" alt="Card 3" class="card-image">
+                        <img src="https://via.placeholder.com/256x160/888/fff?text=Card+4" alt="Card 4" class="card-image">
+                    </div>
+                </section>
+
+                <section id="section-video" class="hidden">
+                     <h2 class="app-title">STEP 3: Watch a Short Video</h2>
+                     <video id="promo-video" class="video-player" controls poster="https://via.placeholder.com/600x338/000/fff?text=Video+Thumbnail">
+                         <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                         Your browser does not support the video tag.
+                     </video>
+                </section>
+
+                <section id="section-paychallenge" class="hidden">
+                    <h2 class="app-title">STEP 4: Payment Challenge</h2>
+                    <p class="app-description">Make payments to unlock greater rewards.</p>
+                    <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
+                    <p id="progress-text" class="progress-text">Current Spend: 0 | Next Goal: 50,000</p>
+                    <button id="btn-pay" class="button-primary">Make a Test Payment (50,000)</button>
+                </section>
             </div>
-        </div>
-    </section>
 
-    <script src="app.js"></script>
+            <div class="static-info">
+                <div class="text-list">
+                    <div class="text-list-item">
+                        <div class="item-bar"></div>
+                        <div class="item-number">01</div>
+                        <p class="item-description">Instant rewards upon starting.</p>
+                    </div>
+                    <div class="text-list-item">
+                        <div class="item-bar"></div>
+                        <div class="item-number">02</div>
+                        <p class="item-description">Micro-tasks for continuous engagement.</p>
+                    </div>
+                    <div class="text-list-item">
+                        <div class="item-bar"></div>
+                        <div class="item-number">03</div>
+                        <p class="item-description">Unlock exclusive content and features.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="app.js" defer></script>
 </body>
 </html>

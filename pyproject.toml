@@ -1,20 +1,15 @@
-# Poetry 도구에 대한 프로젝트 메타데이터 섹션
 [tool.poetry]
 name = "onboarding-challenge"
 version = "0.1.0"
-description = "경량 온보딩 및 점진 누적 결제 유도 프로젝트"
+description = "경량 온보딩 & 점진 누적 결제 유도 시스템"
 authors = ["Tele-Chatbot <chatbot@example.com>"]
 readme = "README.md"
 
-# 프로젝트가 의존하는 라이브러리 목록
 [tool.poetry.dependencies]
-python = "^3.10"  # 이 프로젝트는 파이썬 3.10 이상 버전과 호환됩니다.
-fastapi = "^0.111.0" # FastAPI 프레임워크
-uvicorn = {extras = ["standard"], version = "^0.30.1"} # ASGI 서버
+python = "^3.10"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.1"}
 
-# 빌드 시스템에 대한 설정 (Poetry 표준)
-pydantic = "^2.11.5"
-replit = "^4.1.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
