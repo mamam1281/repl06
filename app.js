@@ -42,8 +42,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userStatus) userStatus.classList.remove('hidden');
     }
 
+    // [추가] 챌린지 맵 UI 업데이트 함수
+    function updateChallengeMap(currentDay) {
+        const challengeMap = document.querySelector('.challenge-map');
+        if (!challengeMap) return;
+
+        const dayNodes = challengeMap.querySelectorAll('.day-node');
+        dayNodes.forEach(node => {
+            const day = parseInt(node.dataset.day, 10);
+            const icon = node.querySelector('.day-icon');
+            icon.className = 'day-icon'; // 클래스 초기화
+            icon.textContent = ''; // 텍스트 초기화
+
+            if (day < currentDay) {
+                icon.classList.add('is-complete');
+            } else if (day === currentDay) {
+                icon.classList.add('is-active');
+                icon.textContent = day;
+            } else {
+                icon.classList.add('is-locked');
+            }
+        });
+        challengeMap.classList.remove('hidden');
+    }
+
+
     function updateNextDayButtonVisibility() {
-        // [수정] 테스트 유저라면 항상 '다음 날' 버튼 표시 (14일 제한 해제)
         if (appState.isTestUser) {
             btnNextDay.classList.remove('hidden');
         } else {
@@ -53,7 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderCurrentDayMission() {
         updateUserStatus();
-        missionBoard.innerHTML = ''; 
+        updateChallengeMap(appState.progressionDay); // [추가] 챌린지 맵 업데이트
+        missionBoard.innerHTML = '';
         let missionTemplate;
 
         appState.surveyStep = 0;
@@ -61,26 +86,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (appState.progressionDay) {
             case 1:
-                missionBoard.innerHTML = `
-                    <h2>DAY 1 완료!</h2>
-                    <p>오늘의 미션을 성공적으로 마쳤습니다. 내일 새로운 미션으로 만나요!</p>
-                    <a href="https://example.com" target="_blank" class="link-to-site" style="color: #a5b4fc; text-decoration: underline;">본사 홈페이지 바로가기</a>
-                `;
+                missionTemplate = templates.querySelector('#template-mission-complete').cloneNode(true);
+                missionTemplate.querySelector('.mission-title').textContent = "챌린지 시작!";
+                missionTemplate.querySelector('.mission-description').innerHTML = "환영합니다! 내일부터 본격적인 미션이 시작됩니다.";
+                missionBoard.appendChild(missionTemplate);
                 break;
             case 2:
-                missionTemplate = templates.querySelector('#template-survey').innerHTML;
-                missionBoard.innerHTML = missionTemplate;
+                missionTemplate = templates.querySelector('#template-survey').cloneNode(true);
+                missionBoard.appendChild(missionTemplate);
                 loadSurveyQuestion();
                 break;
             case 3: case 4: case 5: case 6:
-                missionTemplate = templates.querySelector('#template-cardnews-button').innerHTML;
-                missionBoard.innerHTML = missionTemplate;
-                missionBoard.querySelector('h2').textContent = `DAY ${appState.progressionDay}: Card News`;
+                missionTemplate = templates.querySelector('#template-cardnews-button').cloneNode(true);
+                missionTemplate.querySelector('.mission-title').textContent = `DAY ${appState.progressionDay}: Card News`;
+                missionBoard.appendChild(missionTemplate);
                 document.getElementById('btn-view-card').addEventListener('click', handleCardViewButtonClick);
                 break;
             case 7:
-                missionTemplate = templates.querySelector('#template-video').innerHTML;
-                missionBoard.innerHTML = missionTemplate;
+                missionTemplate = templates.querySelector('#template-video').cloneNode(true);
+                missionBoard.appendChild(missionTemplate);
                 const promoVideo = document.getElementById('promo-video');
                 if (promoVideo) {
                     let videoThrottleTimer;
@@ -95,19 +119,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 break;
             case 8: case 9: case 10: case 11: case 12: case 13: case 14:
-                missionTemplate = templates.querySelector('#template-paychallenge').innerHTML;
-                missionBoard.innerHTML = missionTemplate;
-                missionBoard.querySelector('h2').textContent = `DAY ${appState.progressionDay}: Payment Challenge`;
-                const challengeDesc = missionBoard.querySelector('#challenge-description');
+                missionTemplate = templates.querySelector('#template-paychallenge').cloneNode(true);
+                missionTemplate.querySelector('.mission-title').textContent = `DAY ${appState.progressionDay}: Payment Challenge`;
+                const challengeDesc = missionTemplate.querySelector('#challenge-description');
                 if (challengeDesc) {
                     challengeDesc.textContent = appState.progressionDay >= 11 ? "10만원 이상 결제 기록하기" : "결제 활동 기록하기";
                 }
+                missionBoard.appendChild(missionTemplate);
                 document.getElementById('btn-pay').addEventListener('click', handlePayment);
                 break;
             default:
-                missionBoard.innerHTML = `<h2>All missions complete!</h2><p>모든 챌린지에 참여해주셔서 감사합니다!</p>`;
+                missionTemplate = templates.querySelector('#template-complete').cloneNode(true);
+                missionBoard.appendChild(missionTemplate);
         }
 
+        updateNextDayButtonVisibility();
+    }
+
+    function showMissionComplete() {
+        missionBoard.innerHTML = '';
+        const missionTemplate = templates.querySelector('#template-mission-complete').cloneNode(true);
+        missionBoard.appendChild(missionTemplate);
         updateNextDayButtonVisibility();
     }
 
@@ -139,8 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadSurveyQuestion() {
         if (appState.surveyStep >= surveyQuestions.length) {
-            missionBoard.innerHTML = `<p>오늘의 미션 완료! 챌린지에 참여해주셔서 감사합니다.<br>내일 새로운 미션으로 만나요!</p>`;
-            updateNextDayButtonVisibility();
+            showMissionComplete();
             return;
         }
         const currentQuestion = surveyQuestions[appState.surveyStep];
@@ -191,8 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 showToast("이미 오늘의 보상을 받으셨습니다.");
             }
-            missionBoard.innerHTML = `<p>오늘의 미션 완료! 내일 새로운 보상이 기다립니다.</p>`;
-            updateNextDayButtonVisibility();
+            showMissionComplete();
         } catch(error) { showToast(error.message); }
     }
 
@@ -221,8 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast(`영상 시청 완료! +${res.points_awarded.toLocaleString()} 포인트`);
                     updateUserStatus();
                 }
-                missionBoard.innerHTML = `<p>영상 시청 완료! 내일의 챌린지도 기대해주세요.</p>`;
-                updateNextDayButtonVisibility();
+                showMissionComplete();
             } catch(error) { showToast(error.message); }
         }
     }
@@ -254,8 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(`특별 보상 [${res.special_reward}] 획득!`);
             }
             updateUserStatus();
-            missionBoard.innerHTML = `<p>오늘의 챌린지 참여 완료! 관리자 확인 후 보상이 지급됩니다.</p>`;
-            updateNextDayButtonVisibility();
+            showMissionComplete();
         } catch(error) { showToast(error.message); }
     }
 

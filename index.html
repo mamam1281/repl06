@@ -6,88 +6,88 @@
     <title>Onboarding Challenge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-    <div class="page-container">
-        <main class="main-grid">
-
-            <div class="app-container">
-
-                <div id="user-status" class="user-status hidden">
-                    <div>
-                        <span id="user-id-display"></span>
-                        <span id="progression-day-display"></span>
-                    </div>
-                    <span id="total-points-display"></span>
-                </div>
-
-                <div id="mission-board">
-                    <section id="section-nickname">
-                        <h1 class="app-title">돌아온 당신을 위한 14일간의 특별한 챌린지</h1>
-                        <p class="app-description">코드를 입력하고 14일간의 보상 여정을 시작하세요. 매일 주어지는 간단한 미션을 완료하고, 쏟아지는 포인트와 특별한 최종 보상까지 모두 획득할 기회입니다.</p>
-                        <div class="input-group">
-                            <input id="nickname-input" class="input-form" type="text" placeholder="Enter your code">
-                            <button id="btn-start" class="button-primary">Start Now</button>
-                        </div>
-                    </section>
-                </div>
-
-                <button id="btn-next-day" class="button-secondary hidden">다음 날로 진행하기 (테스트용)</button>
-
+    <div class="lounge-app">
+        <header id="user-status" class="lounge-header hidden">
+            <div class="user-info">
+                <span id="user-id-display"></span>
+                <span id="progression-day-display"></span>
             </div>
+            <div class="user-points">
+                <svg class="points-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 1.5L14.32 8.78H22.5L15.94 13.52L18.26 20.8L12 16.06L5.74 20.8L8.06 13.52L1.5 8.78H9.68L12 1.5Z" fill="#FAD02C"/></svg>
+                <span id="total-points-display"></span>
+            </div>
+        </header>
 
-            <div class="static-info">
-                <div class="text-list">
-                    <div class="text-list-item">
-                        <div class="item-bar"></div>
-                        <div class="item-number">01</div>
-                        <p class="item-description">매일매일 새롭게 열리는 미션과 보상</p>
-                    </div>
-                    <div class="text-list-item">
-                        <div class="item-bar"></div>
-                        <div class="item-number">02</div>
-                        <p class="item-description">꾸준한 참여로 더 커지는 최종 혜택</p>
-                    </div>
-                    <div class="text-list-item">
-                        <div class="item-bar"></div>
-                        <div class="item-number">03</div>
-                        <p class="item-description">오직 당신만을 위한 특별한 보상 플랜</p>
+        <main class="lounge-main">
+            <section class="challenge-map hidden">
+                <h2 class="map-title">Challenge Map</h2>
+                <div class="map-path">
+                    <div class="day-node" data-day="1"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="2"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="3"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="4"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="5"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="6"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="7"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="8"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="9"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="10"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="11"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="12"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="13"><div class="day-icon"></div></div>
+                    <div class="day-node" data-day="14"><div class="day-icon"></div></div>
+                </div>
+            </section>
+
+            <section id="mission-board">
+                <div id="section-nickname">
+                    <h1 class="app-title">돌아온 당신을 위한 14일간의 특별한 챌린지</h1>
+                    <p class="app-description">코드를 입력하고 14일간의 보상 여정을 시작하세요. 매일 주어지는 간단한 미션을 완료하고, 쏟아지는 포인트와 특별한 최종 보상까지 모두 획득할 기회입니다.</p>
+                    <div class="input-group">
+                        <input id="nickname-input" class="input-form" type="text" placeholder="Enter your code">
+                        <button id="btn-start" class="button-primary">Start Now</button>
                     </div>
                 </div>
-            </div>
-
+            </section>
         </main>
+
+        <button id="btn-next-day" class="button-secondary hidden">다음 날로 진행하기 (테스트용)</button>
     </div>
 
     <div id="templates" class="hidden">
-
-        <div id="template-survey">
-             <h2 class="app-title">DAY 2: Short Survey</h2>
-             <p class="app-description">총 3개의 질문에 답변하고 포인트를 획득하세요.</p>
+        <div id="template-survey" class="mission-card">
+             <h2 class="mission-title">DAY 2: Short Survey</h2>
+             <p class="mission-description">총 3개의 질문에 답변하고 포인트를 획득하세요.</p>
              <div id="survey-container"></div>
         </div>
 
-        <div id="template-cardnews-button">
-            <h2 class="app-title"></h2>
-            <p class="app-description">오늘의 카드 뉴스를 확인하고 보상을 받으세요.</p>
-            <button id="btn-view-card" class="button-primary">오늘의 카드 뉴스 보기</button>
+        <div id="template-cardnews-button" class="mission-card">
+            <h2 class="mission-title"></h2>
+            <p class="mission-description">오늘의 카드 뉴스를 확인하고 보상을 받으세요.</p>
+            <div class="card-slider">
+                <img src="https://via.placeholder.com/256x160/777/FFF?text=Card+1" class="card-image">
+                <img src="https://via.placeholder.com/256x160/888/FFF?text=Card+2" class="card-image">
+                <img src="https://via.placeholder.com/256x160/999/FFF?text=Card+3" class="card-image">
+            </div>
+            <button id="btn-view-card" class="button-primary">모두 확인하고 보상받기</button>
         </div>
 
-        <div id="template-video">
-             <h2 class="app-title">DAY 7: Watch a Short Video</h2>
-             <p class="app-description">영상을 50% 이상 시청하면 중간 보상이, 끝까지 시청하면 완료 보상이 지급됩니다.</p>
+        <div id="template-video" class="mission-card">
+             <h2 class="mission-title">DAY 7: Watch a Short Video</h2>
+             <p class="mission-description">영상을 50% 이상 시청하면 중간 보상이, 끝까지 시청하면 완료 보상이 지급됩니다.</p>
              <video id="promo-video" class="video-player" controls poster="https://via.placeholder.com/600x338/000/fff?text=Video+Thumbnail">
                  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
                  Your browser does not support the video tag.
              </video>
         </div>
 
-        <div id="template-paychallenge">
-            <h2 class="app-title"></h2>
-            <p class="app-description">오늘의 챌린지: <span id="challenge-description"></span></p>
+        <div id="template-paychallenge" class="mission-card">
+            <h2 class="mission-title"></h2>
+            <p class="mission-description">오늘의 챌린지: <span id="challenge-description"></span></p>
             <div class="admin-notice">
                 <p><strong>[중요] 보상 지급 안내</strong></p>
                 <p>챌린지 보상은 관리자가 파트너님의 결제 내역을 직접 확인한 후, 영업일 기준 1-2일 내에 수동으로 지급해 드립니다. '기록하기' 버튼을 누르면 정상적으로 참여 처리됩니다.</p>
@@ -98,13 +98,18 @@
             </div>
         </div>
 
-        <div id="template-complete">
-            <h2 class="app-title">All missions complete!</h2>
-            <p class="app-description">모든 챌린지에 참여해주셔서 감사합니다!</p>
+        <div id="template-complete" class="mission-card">
+            <h2 class="mission-title">All missions complete!</h2>
+            <p class="mission-description">모든 챌린지에 참여해주셔서 감사합니다!</p>
+        </div>
+
+        <div id="template-mission-complete" class="mission-card">
+            <div class="completion-icon">✔</div>
+            <h2 class="mission-title">오늘의 미션 완료!</h2>
+            <p class="mission-description">챌린지에 참여해주셔서 감사합니다.<br>내일 새로운 미션으로 만나요!</p>
         </div>
 
     </div>
-
     <script src="app.js" defer></script>
 </body>
 </html>

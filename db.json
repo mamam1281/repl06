@@ -14,29 +14,25 @@
         "video_viewers": 0,
         "card_finishers": 0
     },
+    "user:peter-a4t7:valid": "1",
+    "user:peter-a4t7:points": 5000,
+    "user:peter-a4t7:progression_day": 1,
+    "user:peter-a4t7:survey_step": 0,
+    "user:peter-a4t7:video_progress": 0,
+    "user:peter-a4t7:payment_log": {},
+    "user:peter-a4t7:spend_amount": 0,
+    "user:peter-a4t7:spend_tier": 0,
     "user:tester-01:valid": "1",
-    "user:tester-01:points": 176735,
+    "user:tester-01:points": 15000,
     "user:tester-01:progression_day": 7,
     "user:tester-01:survey_step": 3,
-    "user:tester-01:viewed_cards": [
-        3,
-        4,
-        5,
-        6
-    ],
-    "user:tester-01:video_progress": 100,
-    "user:tester-01:payment_log": {
-        "day_8": 150000,
-        "day_9": 100000,
-        "day_10": 50000,
-        "day_12": 100000,
-        "day_13": 100000,
-        "day_14": 100000
-    },
+    "user:tester-01:video_progress": 0,
+    "user:tester-01:payment_log": {},
+    "user:tester-01:spend_amount": 0,
+    "user:tester-01:spend_tier": 0,
     "user:tester-01:survey_responses": {
-        "question_1": "\uc785\uae08",
-        "question_2": "\uc785\uae08",
-        "question_3": "\uc785\uae08"
-    },
-    "user:tester-01:last_activity_date": "2025-06-07T13:18:16.740994+00:00"
+        "question_1": "\uc548\ub155",
+        "question_2": "\uc77c\ucc28",
+        "question_3": "\ub05d"
+    }
 }
