@@ -215,14 +215,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 userId: appState.userId,
                 day: appState.progressionDay
             });
+
             if (res.points_awarded > 0) {
                 appState.totalPoints = res.total_points;
+                // [수정] 사용자에게 명확한 피드백을 먼저 제공
                 showToast(`오늘의 카드 보상! +${res.points_awarded.toLocaleString()} 포인트`);
                 updateUserStatus();
             } else {
                 showToast("이미 오늘의 보상을 받으셨습니다.");
             }
-            showMissionComplete();
+
+            // [수정] 피드백을 보여준 후, 1.5초 뒤에 완료 화면으로 전환하여 인지할 시간을 줌
+            setTimeout(() => {
+                showMissionComplete();
+            }, 1500);
+
         } catch(error) { showToast(error.message); }
     }
 
