@@ -18,10 +18,36 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [workflows]
-runButton = "Run FastAPI Server"
+runButton = "Run PostgreSQL Version"
 
 [[workflows.workflow]]
 name = "Run FastAPI Server"
+author = 43226313
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python setup_db.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 5000 --reload"
+
+[[workflows.workflow]]
+name = "Run JSON Version"
+author = 43226313
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python setup_db_json.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main_json:app --host 0.0.0.0 --port 5000 --reload"
+
+[[workflows.workflow]]
+name = "Run PostgreSQL Version"
 author = 43226313
 mode = "sequential"
 

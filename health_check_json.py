@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter
 from datetime import datetime
-import database as db
+import database_json as db
 
 router = APIRouter()
 
@@ -15,9 +15,9 @@ async def health_check():
         return {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
-            "database": "connected",
+            "database": "json_file",
             "registered_users": len(test_users),
-            "version": "1.0.0-postgresql"
+            "version": "1.0.0-json"
         }
     except Exception as e:
         return {
@@ -37,8 +37,8 @@ async def api_status():
             active_users.append(nickname)
     
     return {
-        "api_version": "1.0.0-postgresql",
-        "database_type": "postgresql",
+        "api_version": "1.0.0-json",
+        "database_type": "json",
         "total_registered": len(allowed_users),
         "active_participants": len(active_users),
         "endpoints_available": [
@@ -46,7 +46,6 @@ async def api_status():
             "/api/survey", 
             "/api/cardview",
             "/api/video",
-            "/api/spend",
-            "/admin"
+            "/api/pay-challenge"
         ]
     }
