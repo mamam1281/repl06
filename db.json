@@ -1,23 +1,42 @@
 {
-    "allowed_users": [
-        "peter-a4t7",
-        "joy-b5g8",
-        "chris-c9h1",
-        "tester-01",
-        "t001",
-        "t002",
-        "t003"
-    ],
-    "test_users": [
-        "tester-01",
-        "t001",
-        "t002",
-        "t003"
-    ],
-    "global_stats": {
-        "participants": 0,
-        "total_points_awarded": 0,
-        "video_viewers": 0,
-        "card_finishers": 0
-    }
+  "allowed_users": [
+    "t001",
+    "t002",
+    "t003"
+  ],
+  "test_users": [
+    "tester-01",
+    "t001",
+    "t002",
+    "t003"
+  ],
+  "global_stats": {
+    "participants": 1,
+    "total_points_awarded": 5000,
+    "video_viewers": 0,
+    "card_finishers": 0
+  },
+  "user:t001:points": 5000,
+  "user:t001:progression_day": 1,
+  "user:t001:survey_step": 0,
+  "user:t001:survey_responses": {},
+  "user:t001:viewed_cards": [],
+  "user:t001:video_progress": 0,
+  "user:t001:payment_activities": [],
+  "user:t002:points": 5000,
+  "user:t002:progression_day": 1,
+  "user:t002:survey_step": 0,
+  "user:t002:survey_responses": {},
+  "user:t002:viewed_cards": [],
+  "user:t002:video_progress": 0,
+  "user:t002:payment_activities": [],
+  "user:t003:points": 5000,
+  "user:t003:progression_day": 1,
+  "user:t003:survey_step": 0,
+  "user:t003:survey_responses": {},
+  "user:t003:viewed_cards": [],
+  "user:t003:video_progress": 0,
+  "user:t003:payment_activities": [],
+  "user:t001:valid": true,
+  "user:t001:created_at": "2025-07-04T05:57:22.882396+00:00"
 }
