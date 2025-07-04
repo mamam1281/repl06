@@ -6,10 +6,23 @@ import random
 from contextlib import asynccontextmanager
 from datetime import datetime, date, timezone
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import FileResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel
 import database as db
 from admin import setup_admin_routes
+from health_check import router as health_router
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,7 +30,24 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 프로덕션에서는 특정 도메인으로 제한
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 보안 헤더 미들웨어
+app.add_middleware(SecurityHeadersMiddleware)
+
+# 신뢰할 수 있는 호스트 설정 (선택사항)
+# app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*.replit.dev", "*.repl.co"])
+
 setup_admin_routes(app)
+app.include_router(health_router)
 
 class IdentifyRequest(BaseModel): nickname: str
 class SurveyRequest(BaseModel): userId: str; questionId: int; response: str

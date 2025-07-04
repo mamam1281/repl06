@@ -351,7 +351,21 @@ def setup_admin_routes(app):
                             `;
                             
                             users.forEach(user => {
-                                html += `<div style="padding: 8px 12px; background: #f8fafc; border-radius: 6px; border-left: 3px solid #667eea;">${user}</div>`;
+                                html += `
+                                    <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #667eea; display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-weight: 500;">${user}</span>
+                                        <div style="display: flex; gap: 8px;">
+                                            <form action="/admin/reset-user" method="post" style="display: inline;" onsubmit="return confirm('${user}의 진행도를 초기화하시겠습니까?')">
+                                                <input type="hidden" name="nickname" value="${user}">
+                                                <button type="submit" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px; background: #f59e0b; color: white;">초기화</button>
+                                            </form>
+                                            <form action="/admin/delete-user" method="post" style="display: inline;" onsubmit="return confirm('${user}를 완전히 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
+                                                <input type="hidden" name="nickname" value="${user}">
+                                                <button type="submit" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px; background: #dc2626; color: white;">삭제</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                `;
                             });
                             
                             html += '</div>';
@@ -620,6 +634,52 @@ def setup_admin_routes(app):
         if admin_session != ADMIN_PASSWORD:
             raise HTTPException(status_code=401, detail="권한이 없습니다")
         return db.get("allowed_users", [])
+
+    @app.post("/admin/delete-user")
+    async def delete_user(nickname: str = Form(...), admin_session: str = Cookie(None)):
+        if admin_session != ADMIN_PASSWORD:
+            raise HTTPException(status_code=401, detail="권한이 없습니다")
+        
+        allowed_users = db.get("allowed_users", [])
+        if nickname in allowed_users:
+            allowed_users.remove(nickname)
+            db.set("allowed_users", allowed_users)
+            
+            # 사용자 데이터도 함께 삭제
+            user_keys = [
+                f"user:{nickname}:valid",
+                f"user:{nickname}:points",
+                f"user:{nickname}:progression_day",
+                f"user:{nickname}:survey_step",
+                f"user:{nickname}:survey_responses",
+                f"user:{nickname}:viewed_cards",
+                f"user:{nickname}:video_progress",
+                f"user:{nickname}:payment_log",
+                f"user:{nickname}:last_activity_date"
+            ]
+            
+            for key in user_keys:
+                db.delete(key)
+        
+        return RedirectResponse(url="/admin", status_code=302)
+
+    @app.post("/admin/reset-user")
+    async def reset_user(nickname: str = Form(...), admin_session: str = Cookie(None)):
+        if admin_session != ADMIN_PASSWORD:
+            raise HTTPException(status_code=401, detail="권한이 없습니다")
+        
+        if nickname in db.get("allowed_users", []):
+            # 사용자 진행도 초기화
+            db.set(f"user:{nickname}:points", 5000)
+            db.set(f"user:{nickname}:progression_day", 1)
+            db.set(f"user:{nickname}:survey_step", 0)
+            db.set(f"user:{nickname}:survey_responses", {})
+            db.set(f"user:{nickname}:viewed_cards", [])
+            db.set(f"user:{nickname}:video_progress", 0)
+            db.set(f"user:{nickname}:payment_log", {})
+            db.delete(f"user:{nickname}:last_activity_date")
+        
+        return RedirectResponse(url="/admin", status_code=302)
 
     @app.get("/admin/detailed-analysis")
     async def get_detailed_analysis(admin_session: str = Cookie(None)):
