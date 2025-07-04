@@ -18,7 +18,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [workflows]
-runButton = "Run PostgreSQL Version"
+runButton = "Run JSON Version"
 
 [[workflows.workflow]]
 name = "Run FastAPI Server"
