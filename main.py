@@ -186,6 +186,7 @@ async def get_user_status(nickname: str):
         "points": db.get(f"user:{nickname}:points", 0),
         "progression_day": db.get(f"user:{nickname}:progression_day", 1),
         "survey_step": db.get(f"user:{nickname}:survey_step", 0),
+        "survey_responses": db.get(f"user:{nickname}:survey_responses", {}),
         "viewed_cards": db.get(f"user:{nickname}:viewed_cards", []),
         "video_progress": db.get(f"user:{nickname}:video_progress", 0),
         "payment_log": db.get(f"user:{nickname}:payment_log", {}),
