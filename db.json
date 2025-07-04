@@ -3,36 +3,73 @@
         "peter-a4t7",
         "joy-b5g8",
         "chris-c9h1",
-        "tester-01"
+        "tester-01",
+        "t001",
+        "t002",
+        "t003"
     ],
     "test_users": [
-        "tester-01"
+        "tester-01",
+        "t001",
+        "t002",
+        "t003"
     ],
     "global_stats": {
-        "participants": 1,
+        "participants": 2,
         "total_points_awarded": 0,
         "video_viewers": 0,
         "card_finishers": 0
     },
-    "user:peter-a4t7:valid": "1",
-    "user:peter-a4t7:points": 5000,
-    "user:peter-a4t7:progression_day": 1,
-    "user:peter-a4t7:survey_step": 0,
-    "user:peter-a4t7:video_progress": 0,
-    "user:peter-a4t7:payment_log": {},
-    "user:peter-a4t7:spend_amount": 0,
-    "user:peter-a4t7:spend_tier": 0,
-    "user:tester-01:valid": "1",
-    "user:tester-01:points": 15000,
-    "user:tester-01:progression_day": 7,
-    "user:tester-01:survey_step": 3,
-    "user:tester-01:video_progress": 0,
-    "user:tester-01:payment_log": {},
-    "user:tester-01:spend_amount": 0,
-    "user:tester-01:spend_tier": 0,
-    "user:tester-01:survey_responses": {
+    "user:t001:valid": "1",
+    "user:t001:points": 385000,
+    "user:t001:progression_day": 2,
+    "user:t001:survey_step": 3,
+    "user:t001:viewed_cards": [
+        3,
+        4,
+        5,
+        6
+    ],
+    "user:t001:video_progress": 100,
+    "user:t001:payment_log": {
+        "day_8": 500000000,
+        "day_9": 100000,
+        "day_10": 100000,
+        "day_11": 200000,
+        "day_12": 200000,
+        "day_13": 200000,
+        "day_14": 200000
+    },
+    "user:t001:survey_responses": {
         "question_1": "\uc548\ub155",
         "question_2": "\uc77c\ucc28",
         "question_3": "\ub05d"
-    }
+    },
+    "user:t001:last_activity_date": "2025-07-04T03:45:31.115422+00:00",
+    "user:t003:valid": "1",
+    "user:t003:points": 138000,
+    "user:t003:progression_day": 2,
+    "user:t003:survey_step": 3,
+    "user:t003:viewed_cards": [
+        3,
+        4,
+        5,
+        6
+    ],
+    "user:t003:video_progress": 0,
+    "user:t003:payment_log": {
+        "day_8": 100000,
+        "day_9": 100000,
+        "day_10": 100000,
+        "day_11": 200000,
+        "day_12": 200000,
+        "day_13": 200000,
+        "day_14": 200000
+    },
+    "user:t003:survey_responses": {
+        "question_1": "\uc548\ub155",
+        "question_2": "\ud3ec\uc778\ud2b8",
+        "question_3": "\uc548\ub155"
+    },
+    "user:t003:last_activity_date": "2025-07-04T05:10:59.302825+00:00"
 }

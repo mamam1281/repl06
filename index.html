@@ -67,47 +67,16 @@
 
         <div id="template-cardnews-button" class="mission-card">
             <h2 class="mission-title"></h2>
-            <p class="mission-description">오늘의 카드 뉴스를 확인하고 보상을 받으세요.</p>
-            
-            <div class="card-slider">
-                <svg width="640" height="200" viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <style>
-                      .title { font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 18px; fill: #FAD02C; }
-                      .desc { font-family: 'Noto Sans KR', sans-serif; font-weight: 400; font-size: 14px; fill: #d1d5db; }
-                      .highlight { font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 16px; fill: #FFFFFF; }
-                    </style>
-                  </defs>
-                  
-                  <g transform="translate(10, 10)">
-                    <rect x="0" y="0" width="200" height="180" rx="16" fill="#252528" stroke="#555" stroke-width="1"/>
-                    <text x="20" y="40" class="title">✨ 독점 공개</text>
-                    <text x="20" y="80" class="desc">90%는 모르는</text>
-                    <text x="20" y="105" class="highlight">포인트 부스팅 꿀팁!</text>
-                    <text x="140" y="160" fill="#444" font-size="12">1 / 3</text>
-                  </g>
-                
-                  <g transform="translate(220, 10)">
-                    <rect x="0" y="0" width="200" height="180" rx="16" fill="#252528" stroke="#555" stroke-width="1"/>
-                    <text x="20" y="40" class="title">🎁 랜덤 보너스</text>
-                    <text x="20" y="80" class="desc">8~10일차 결제 챌린지에서</text>
-                    <text x="20" y="105" class="highlight">최대 30,000 포인트</text>
-                    <text x="20" y="130" class="desc">보너스가 숨어있습니다.</text>
-                    <text x="140" y="160" fill="#444" font-size="12">2 / 3</text>
-                  </g>
-                
-                  <g transform="translate(430, 10)">
-                    <rect x="0" y="0" width="200" height="180" rx="16" fill="#252528" stroke="#555" stroke-width="1"/>
-                    <text x="20" y="40" class="title">🔥 최종 보상 스포일러</text>
-                    <text x="20" y="80" class="desc">14일차 미션 완료 시,</text>
-                    <text x="20" y="105" class="highlight">'배민 상품권'</text>
-                    <text x="20" y="130" class="desc">특별 보상이 기다립니다.</text>
-                    <text x="140" y="160" fill="#444" font-size="12">3 / 3</text>
-                  </g>
-                </svg>
+            <p class="mission-description"></p>
+            <div class="card-scene">
+                <div class="card-flipper">
+                    <div class="card-face card-face--front">
+                        </div>
+                    <div class="card-face card-face--back">
+                        </div>
+                </div>
             </div>
-            
-            <button id="btn-view-card" class="button-primary">모두 확인하고 보상받기</button>
+            <button id="btn-view-card" class="button-primary hidden">확인 완료! 보상받기</button>
         </div>
 
         <div id="template-video" class="mission-card">
@@ -142,7 +111,6 @@
             <h2 class="mission-title">오늘의 미션 완료!</h2>
             <p class="mission-description">챌린지에 참여해주셔서 감사합니다.<br>내일 새로운 미션으로 만나요!</p>
         </div>
-
     </div>
     <script src="app.js" defer></script>
 </body>

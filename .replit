@@ -18,6 +18,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [workflows]
+runButton = "Run FastAPI Server"
 
 [[workflows.workflow]]
 name = "Run FastAPI Server"

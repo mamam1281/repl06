@@ -11,6 +11,33 @@ document.addEventListener('DOMContentLoaded', () => {
         isTestUser: false,
     };
 
+    const cardNewsContent = {
+        3: {
+            title: "첫 번째 비밀",
+            description: "VIP를 위한 첫 번째 비밀 카드를 뒤집어보세요.",
+            front: `<div class="card-icon">🔑</div><div class="card-title-front">첫 번째 비밀</div><div class="card-desc-small">(탭하여 뒷면 확인)</div>`,
+            back: `<div class="card-title-back">[꿀팁] 빠른 포인트 적립!</div><div class="card-divider"></div><div class="card-desc">7일차 영상 미션은 50%만 봐도 첫 보상이 지급됩니다.</div>`
+        },
+        4: {
+            title: "포인트 해킹",
+            description: "포인트를 2배로 불릴 수 있는 비밀 정보!",
+            front: `<div class="card-icon">💰</div><div class="card-title-front">Point Hacking</div><div class="card-desc-small">(탭하여 뒷면 확인)</div>`,
+            back: `<div class="card-title-back">[독점 정보] 랜덤 보너스!</div><div class="card-divider"></div><div class="card-desc">8~10일차 입금 챌린지에서 최대 <strong>30,000 포인트</strong> 보너스가 숨어있습니다.</div>`
+        },
+        5: {
+            title: "챌린지 스포일러",
+            description: "미리 알면 더 유리한 다음 챌린지 힌트.",
+            front: `<div class="card-icon">🤫</div><div class="card-title-front">챌린지 스포일러</div><div class="card-desc-small">(탭하여 뒷면 확인)</div>`,
+            back: `<div class="card-title-back">[중요] 10만원 이상!</div><div class="card-divider"></div><div class="card-desc">11일차부터는 <strong>10만원 이상</strong> 입금해야 특별 보상을 받을 수 있습니다.</div>`
+        },
+        6: {
+            title: "최종 보상 공개",
+            description: "D-8: 마지막까지 포기하지 마세요!",
+            front: `<div class="card-icon">🎁</div><div class="card-title-front">최종 보상은 과연?</div><div class="card-desc-small">(탭하여 뒷면 확인)</div>`,
+            back: `<div class="card-title-back">[최종 보상 공개]</div><div class="card-divider"></div><div class="card-desc">14일차 미션 완료 시 <strong>'배민 상품권 3만원권'</strong>이 기다립니다!</div>`
+        }
+    };
+
     const missionBoard = document.getElementById('mission-board');
     const templates = document.getElementById('templates');
     const btnStart = document.getElementById('btn-start');
@@ -28,7 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return res.json();
     }
-    function showToast(message) { alert(message); }
+
+    function showToast(message) { 
+        alert(message); 
+    }
 
     function updateUserStatus() {
         const userStatus = document.getElementById('user-status');
@@ -42,45 +72,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userStatus) userStatus.classList.remove('hidden');
     }
 
-    // [추가] 챌린지 맵 UI 업데이트 함수
     function updateChallengeMap(currentDay) {
         const challengeMap = document.querySelector('.challenge-map');
         if (!challengeMap) return;
-
         const dayNodes = challengeMap.querySelectorAll('.day-node');
         dayNodes.forEach(node => {
             const day = parseInt(node.dataset.day, 10);
             const icon = node.querySelector('.day-icon');
-            icon.className = 'day-icon'; // 클래스 초기화
-            icon.textContent = ''; // 텍스트 초기화
-
-            if (day < currentDay) {
-                icon.classList.add('is-complete');
-            } else if (day === currentDay) {
-                icon.classList.add('is-active');
-                icon.textContent = day;
-            } else {
-                icon.classList.add('is-locked');
-            }
+            icon.className = 'day-icon';
+            icon.textContent = '';
+            if (day < currentDay) { icon.classList.add('is-complete'); } 
+            else if (day === currentDay) { icon.classList.add('is-active'); icon.textContent = day; } 
+            else { icon.classList.add('is-locked'); }
         });
         challengeMap.classList.remove('hidden');
     }
 
-
     function updateNextDayButtonVisibility() {
-        if (appState.isTestUser) {
-            btnNextDay.classList.remove('hidden');
-        } else {
-            btnNextDay.classList.add('hidden');
-        }
+        if (appState.isTestUser) { btnNextDay.classList.remove('hidden'); } 
+        else { btnNextDay.classList.add('hidden'); }
     }
 
     function renderCurrentDayMission() {
         updateUserStatus();
-        updateChallengeMap(appState.progressionDay); // [추가] 챌린지 맵 업데이트
+        updateChallengeMap(appState.progressionDay);
         missionBoard.innerHTML = '';
         let missionTemplate;
-
         appState.surveyStep = 0;
         appState.videoProgress = 0;
 
@@ -98,9 +115,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 3: case 4: case 5: case 6:
                 missionTemplate = templates.querySelector('#template-cardnews-button').cloneNode(true);
-                missionTemplate.querySelector('.mission-title').textContent = `DAY ${appState.progressionDay}: Card News`;
+                const dayContent = cardNewsContent[appState.progressionDay];
+                missionTemplate.querySelector('.mission-title').textContent = `DAY ${appState.progressionDay}: ${dayContent.title}`;
+                missionTemplate.querySelector('.mission-description').textContent = dayContent.description;
+                missionTemplate.querySelector('.card-face--front').innerHTML = dayContent.front;
+                missionTemplate.querySelector('.card-face--back').innerHTML = dayContent.back;
                 missionBoard.appendChild(missionTemplate);
-                document.getElementById('btn-view-card').addEventListener('click', handleCardViewButtonClick);
+                const cardScene = missionBoard.querySelector('.card-scene');
+                const rewardButton = missionBoard.querySelector('#btn-view-card');
+                cardScene.addEventListener('click', () => {
+                    cardScene.classList.add('is-flipped');
+                    rewardButton.classList.remove('hidden');
+                }, { once: true });
+                rewardButton.addEventListener('click', handleCardViewButtonClick);
                 break;
             case 7:
                 missionTemplate = templates.querySelector('#template-video').cloneNode(true);
@@ -118,13 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     promoVideo.addEventListener('ended', () => handleVideoEnd(promoVideo));
                 }
                 break;
-            case 8: case 9: case 10: case 11: case 12: case 13: case 14:
+            case 8: case 9: case 10:
+            case 11: case 12: case 13: case 14:
                 missionTemplate = templates.querySelector('#template-paychallenge').cloneNode(true);
-                missionTemplate.querySelector('.mission-title').textContent = `DAY ${appState.progressionDay}: Payment Challenge`;
+                missionTemplate.querySelector('.mission-title').textContent = `DAY ${appState.progressionDay}: 입금 챌린지`;
                 const challengeDesc = missionTemplate.querySelector('#challenge-description');
                 if (challengeDesc) {
-                    challengeDesc.textContent = appState.progressionDay >= 11 ? "10만원 이상 결제 기록하기" : "결제 활동 기록하기";
+                    let descText = "";
+                    if (appState.progressionDay <= 10) { descText = "10만원 이상 입금 시, 랜덤 포인트가 지급됩니다."; } 
+                    else { descText = "20만원 이상 입금 시, 더 큰 랜덤 포인트가 지급됩니다!"; }
+                    challengeDesc.innerHTML = descText;
                 }
+                missionTemplate.querySelector('#btn-pay').textContent = "입금 활동 기록하기";
+                missionTemplate.querySelector('#payment-input').placeholder = "입금 금액 입력";
                 missionBoard.appendChild(missionTemplate);
                 document.getElementById('btn-pay').addEventListener('click', handlePayment);
                 break;
@@ -132,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 missionTemplate = templates.querySelector('#template-complete').cloneNode(true);
                 missionBoard.appendChild(missionTemplate);
         }
-
         updateNextDayButtonVisibility();
     }
 
@@ -153,12 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
             appState.totalPoints = res.points;
             appState.progressionDay = res.progression_day;
             appState.isTestUser = res.is_test_user;
-
-            if (res.is_new) {
-                showToast(`환영합니다, ${res.userId}님! 🎉\n+${res.points.toLocaleString()}포인트가 입금됐어요.`);
-            } else {
-                showToast(`${res.userId}님, 다시 오신 것을 환영해요!`);
-            }
+            if (res.is_new) { showToast(`환영합니다, ${res.userId}님! 🎉\n+${res.points.toLocaleString()}포인트가 입금됐어요.`); } 
+            else { showToast(`${res.userId}님, 다시 오신 것을 환영해요!`); }
+            document.getElementById('section-nickname').classList.add('hidden');
             renderCurrentDayMission();
         } catch (error) { showToast(error.message); }
     });
@@ -178,8 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const surveyContainer = document.getElementById('survey-container');
         if (surveyContainer) {
             surveyContainer.innerHTML = `
-                <p class="survey-question">${currentQuestion.text}</p>
                 <div class="input-group">
+                    <p class="survey-question">${currentQuestion.text}</p>
                     <input id="survey-answer" class="input-form" type="text" placeholder="답변을 입력하세요">
                     <button id="btn-submit-survey" class="button-primary">제출하고 포인트 받기</button>
                 </div>
@@ -202,9 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.points_awarded > 0) {
                 appState.totalPoints = res.total_points;
                 showToast(`+${res.points_awarded.toLocaleString()} 포인트! (총 ${res.total_points.toLocaleString()}점)`);
+                updateUserStatus();
             }
             appState.surveyStep++;
-            updateUserStatus();
             loadSurveyQuestion();
         } catch (error) { showToast(error.message); }
     }
@@ -215,21 +244,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 userId: appState.userId,
                 day: appState.progressionDay
             });
-
             if (res.points_awarded > 0) {
                 appState.totalPoints = res.total_points;
-                // [수정] 사용자에게 명확한 피드백을 먼저 제공
                 showToast(`오늘의 카드 보상! +${res.points_awarded.toLocaleString()} 포인트`);
                 updateUserStatus();
             } else {
                 showToast("이미 오늘의 보상을 받으셨습니다.");
             }
-
-            // [수정] 피드백을 보여준 후, 1.5초 뒤에 완료 화면으로 전환하여 인지할 시간을 줌
             setTimeout(() => {
                 showMissionComplete();
             }, 1500);
-
         } catch(error) { showToast(error.message); }
     }
 
@@ -267,20 +291,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const paymentInput = document.getElementById('payment-input');
         if (!paymentInput) return;
         const amount = parseInt(paymentInput.value, 10);
+        if (isNaN(amount) || amount <= 0) { return showToast("올바른 금액을 입력하세요.");}
 
-        if (isNaN(amount) || amount <= 0) {
-            return showToast("올바른 금액을 입력하세요.");
+        if (appState.progressionDay >= 11 && amount < 200000) {
+            return showToast("200,000원 이상 입금해야 챌린지에 참여할 수 있습니다.");
         }
-        if (appState.progressionDay >= 11 && amount < 100000) {
-            return showToast("100,000원 이상 충전해야 챌린지에 참여할 수 있습니다.");
+        if (appState.progressionDay >= 8 && appState.progressionDay <= 10 && amount < 100000) {
+            return showToast("100,000원 이상 입금해야 챌린지에 참여할 수 있습니다.");
         }
+
         try {
             const res = await apiPost('/api/spend', { 
                 userId: appState.userId,
                 day: appState.progressionDay,
                 amount: amount
             });
-
             showToast(res.message);
             if(res.points_awarded > 0) {
                 appState.totalPoints = res.total_points;

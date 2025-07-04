@@ -10,10 +10,14 @@ initial_data = {
         "peter-a4t7",
         "joy-b5g8",
         "chris-c9h1",
-        "tester-01"  # 테스트 유저도 참여 자격이 있어야 합니다.
+        "tester-01",
+        # [수정] 신규 테스트 유저 추가
+        "t001",
+        "t002",
+        "t003"
     ],
-    # [추가] 테스트 유저 목록
-    "test_users": ["tester-01"],
+    # [수정] 테스트 유저 목록
+    "test_users": ["tester-01", "t001", "t002", "t003"],
     # 2. '사회적 증거'를 위한 전역 통계 데이터 초기화
     "global_stats": {
         "participants": 0,
