@@ -37,7 +37,13 @@ def setup_admin_routes(app):
             <h2>현재 등록된 사용자</h2>
             <ul id="user-list"></ul>
             
+            <h2>챌린지 참여자 현황</h2>
+            <div id="participants-status">
+                <p>로딩 중...</p>
+            </div>
+            
             <script>
+                // 등록된 사용자 목록
                 fetch('/admin/users')
                     .then(r => r.json())
                     .then(users => {
@@ -47,6 +53,33 @@ def setup_admin_routes(app):
                             li.textContent = user;
                             list.appendChild(li);
                         });
+                    });
+                
+                // 참여자 현황
+                fetch('/admin/all-users')
+                    .then(r => r.json())
+                    .then(participants => {
+                        const statusDiv = document.getElementById('participants-status');
+                        if (participants.length === 0) {
+                            statusDiv.innerHTML = '<p style="color: #999;">아직 챌린지에 참여한 사용자가 없습니다.</p><p>메인 페이지에서 등록된 닉네임으로 참여를 시작해보세요.</p>';
+                        } else {
+                            let html = `<p><strong>총 ${participants.length}명이 참여 중입니다.</strong></p><table border="1" style="width: 100%; border-collapse: collapse; margin-top: 10px;">`;
+                            html += '<tr><th>닉네임</th><th>진행도</th><th>포인트</th><th>마지막 활동</th></tr>';
+                            participants.forEach(user => {
+                                const lastActivity = user.last_activity === '없음' ? '없음' : new Date(user.last_activity).toLocaleString('ko-KR');
+                                html += `<tr>
+                                    <td><a href="/admin/user/${user.nickname}" target="_blank">${user.nickname}</a></td>
+                                    <td>DAY ${user.progression_day}</td>
+                                    <td>${user.points.toLocaleString()}P</td>
+                                    <td>${lastActivity}</td>
+                                </tr>`;
+                            });
+                            html += '</table>';
+                            statusDiv.innerHTML = html;
+                        }
+                    })
+                    .catch(err => {
+                        document.getElementById('participants-status').innerHTML = '<p style="color: red;">데이터를 불러오는데 실패했습니다.</p>';
                     });
             </script>
         </body>
