@@ -1,5 +1,3 @@
-
-
 from fastapi import FastAPI, HTTPException, Form, File, UploadFile, Cookie, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 import database as db
@@ -45,7 +43,7 @@ def setup_admin_routes(app):
             </body>
             </html>
             """
-        
+
         return """
         <!DOCTYPE html>
         <html>
@@ -169,7 +167,7 @@ def setup_admin_routes(app):
                                         <button type="submit" class="btn btn-primary">추가</button>
                                     </form>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label class="form-label">CSV 파일 업로드</label>
                                     <form action="/admin/upload-csv" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px;">
@@ -178,7 +176,7 @@ def setup_admin_routes(app):
                                     </form>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">일괄 사용자 등록</label>
                                 <form action="/admin/bulk-add-users" method="post">
@@ -214,11 +212,11 @@ def setup_admin_routes(app):
                     // 모든 탭 비활성화
                     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                    
+
                     // 선택된 탭 활성화
                     event.target.classList.add('active');
                     document.getElementById(tabName).classList.add('active');
-                    
+
                     // 해당 탭의 데이터 로드
                     if (tabName === 'participants') loadParticipants();
                     else if (tabName === 'user-management') loadRegisteredUsers();
@@ -236,14 +234,14 @@ def setup_admin_routes(app):
                             fetch('/admin/users'),
                             fetch('/admin/all-users')
                         ]);
-                        
+
                         const users = await usersRes.json();
                         const participants = await participantsRes.json();
-                        
+
                         const totalPoints = participants.reduce((sum, user) => sum + user.points, 0);
                         const completedUsers = participants.filter(user => user.progression_day >= 14).length;
                         const completionRate = participants.length > 0 ? Math.round((completedUsers / participants.length) * 100) : 0;
-                        
+
                         document.getElementById('total-users').textContent = users.length.toLocaleString();
                         document.getElementById('active-participants').textContent = participants.length.toLocaleString();
                         document.getElementById('total-points').textContent = totalPoints.toLocaleString() + 'P';
@@ -258,7 +256,7 @@ def setup_admin_routes(app):
                         const response = await fetch('/admin/all-users');
                         const participants = await response.json();
                         const statusDiv = document.getElementById('participants-status');
-                        
+
                         if (participants.length === 0) {
                             statusDiv.innerHTML = `
                                 <div class="empty-state">
@@ -284,11 +282,11 @@ def setup_admin_routes(app):
                                         </thead>
                                         <tbody>
                             `;
-                            
+
                             participants.forEach(user => {
                                 const progress = Math.round((user.progression_day / 14) * 100);
                                 const lastActivity = user.last_activity === '없음' ? '없음' : new Date(user.last_activity).toLocaleString('ko-KR');
-                                
+
                                 let statusBadge = '';
                                 if (user.progression_day >= 14) {
                                     statusBadge = '<span class="badge badge-success">완료</span>';
@@ -299,7 +297,7 @@ def setup_admin_routes(app):
                                 } else {
                                     statusBadge = '<span class="badge badge-danger">미시작</span>';
                                 }
-                                
+
                                 html += `
                                     <tr>
                                         <td><a href="/admin/user/${user.nickname}" target="_blank" class="user-link">${user.nickname}</a></td>
@@ -317,7 +315,7 @@ def setup_admin_routes(app):
                                     </tr>
                                 `;
                             });
-                            
+
                             html += '</tbody></table></div>';
                             statusDiv.innerHTML = html;
                         }
@@ -336,7 +334,7 @@ def setup_admin_routes(app):
                         const response = await fetch('/admin/users');
                         const users = await response.json();
                         const usersDiv = document.getElementById('registered-users');
-                        
+
                         if (users.length === 0) {
                             usersDiv.innerHTML = `
                                 <div class="empty-state">
@@ -349,7 +347,7 @@ def setup_admin_routes(app):
                                 <div style="margin-bottom: 10px; color: #64748b;">총 ${users.length}명의 사용자가 등록되어 있습니다</div>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
                             `;
-                            
+
                             users.forEach(user => {
                                 html += `
                                     <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #667eea; display: flex; justify-content: space-between; align-items: center;">
@@ -367,7 +365,7 @@ def setup_admin_routes(app):
                                     </div>
                                 `;
                             });
-                            
+
                             html += '</div>';
                             usersDiv.innerHTML = html;
                         }
@@ -381,7 +379,7 @@ def setup_admin_routes(app):
                         const response = await fetch('/admin/detailed-analysis');
                         const data = await response.json();
                         const analysisDiv = document.getElementById('detailed-analysis');
-                        
+
                         let html = `
                             <div class="table-container">
                                 <table class="table">
@@ -396,7 +394,7 @@ def setup_admin_routes(app):
                                     </thead>
                                     <tbody>
                         `;
-                        
+
                         for (let day = 1; day <= 14; day++) {
                             const dayData = data.find(d => d.day === day) || { participants: 0, completion_rate: 0, avg_points: 0, total_points: 0 };
                             html += `
@@ -409,7 +407,7 @@ def setup_admin_routes(app):
                                 </tr>
                             `;
                         }
-                        
+
                         html += '</tbody></table></div>';
                         analysisDiv.innerHTML = html;
                     } catch (error) {
@@ -448,10 +446,10 @@ def setup_admin_routes(app):
     async def get_user_detail_page(nickname: str, admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
             return RedirectResponse(url="/admin")
-            
+
         if not db.exists(f"user:{nickname}:valid"):
             raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
-        
+
         user_data = {
             "nickname": nickname,
             "points": db.get(f"user:{nickname}:points", 0),
@@ -463,7 +461,7 @@ def setup_admin_routes(app):
             "payment_log": db.get(f"user:{nickname}:payment_log", {}),
             "last_activity": db.get(f"user:{nickname}:last_activity_date", "없음")
         }
-        
+
         return f"""
         <!DOCTYPE html>
         <html>
@@ -500,7 +498,7 @@ def setup_admin_routes(app):
                     <h1>👤 {user_data['nickname']} 상세 정보</h1>
                     <a href="/admin" class="back-btn">← 관리자 홈으로 돌아가기</a>
                 </div>
-                
+
                 <div class="progress-card">
                     <h3>🎯 전체 진행률</h3>
                     <div class="progress-bar">
@@ -510,7 +508,7 @@ def setup_admin_routes(app):
                         <strong>DAY {user_data['progression_day']} / 14 ({round((user_data['progression_day'] / 14) * 100)}% 완료)</strong>
                     </div>
                 </div>
-                
+
                 <div class="info-grid">
                     <div class="info-card">
                         <h3>📊 기본 정보</h3>
@@ -531,7 +529,7 @@ def setup_admin_routes(app):
                             <span class="info-value">{user_data['last_activity'] if user_data['last_activity'] != '없음' else '없음'}</span>
                         </div>
                     </div>
-                    
+
                     <div class="info-card">
                         <h3>📝 설문 현황 (DAY 2)</h3>
                         <div class="info-row">
@@ -540,16 +538,16 @@ def setup_admin_routes(app):
                         </div>
                         {''.join([f'<div class="info-row"><span class="info-label">질문 {qid.split("_")[1]}</span><span class="info-value">{resp}</span></div>' for qid, resp in user_data['survey_responses'].items()])}
                     </div>
-                    
+
                     <div class="info-card">
                         <h3>🎴 카드뉴스 현황 (DAY 3-6)</h3>
                         <div class="info-row">
                             <span class="info-label">확인한 카드</span>
-                            <span class="info-value">{len(user_data['viewed_cards'])}/4 개</span>
+                            <span class="info-value">{len(userdata['viewed_cards'])}/4 개</span>
                         </div>
                         {(''.join([f'<div class="activity-item">DAY {card} 카드 확인 완료 ✅</div>' for card in user_data['viewed_cards']]) if user_data['viewed_cards'] else '<div class="activity-item">아직 확인한 카드가 없습니다</div>')}
                     </div>
-                    
+
                     <div class="info-card">
                         <h3>📹 영상 시청 현황 (DAY 7)</h3>
                         <div class="info-row">
@@ -560,7 +558,7 @@ def setup_admin_routes(app):
                             <div class="progress-fill" style="width: {user_data['video_progress']}%"></div>
                         </div>
                     </div>
-                    
+
                     <div class="info-card">
                         <h3>💰 결제 챌린지 현황 (DAY 8-14)</h3>
                         <div class="info-row">
@@ -574,61 +572,61 @@ def setup_admin_routes(app):
         </body>
         </html>
         """
-    
+
     @app.post("/admin/add-user")
     async def add_user(nickname: str = Form(...), admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
             raise HTTPException(status_code=401, detail="권한이 없습니다")
-        
+
         allowed_users = db.get("allowed_users", [])
         if nickname not in allowed_users:
             allowed_users.append(nickname)
             db.set("allowed_users", allowed_users)
         return RedirectResponse(url="/admin", status_code=302)
-    
+
     @app.post("/admin/bulk-add-users")
     async def bulk_add_users(nicknames: str = Form(...), admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
             raise HTTPException(status_code=401, detail="권한이 없습니다")
-            
+
         nickname_list = [nick.strip() for nick in nicknames.split('\n') if nick.strip()]
         allowed_users = db.get("allowed_users", [])
-        
+
         added_count = 0
         for nickname in nickname_list:
             if nickname not in allowed_users:
                 allowed_users.append(nickname)
                 added_count += 1
-        
+
         db.set("allowed_users", allowed_users)
         return RedirectResponse(url="/admin", status_code=302)
-    
+
     @app.post("/admin/upload-csv")
     async def upload_csv(csv_file: UploadFile = File(...), admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
             raise HTTPException(status_code=401, detail="권한이 없습니다")
-            
+
         if not csv_file.filename.endswith('.csv'):
             raise HTTPException(status_code=400, detail="CSV 파일만 업로드 가능합니다.")
-        
+
         content = await csv_file.read()
         csv_reader = csv.reader(io.StringIO(content.decode('utf-8')))
-        
+
         allowed_users = db.get("allowed_users", [])
         added_count = 0
-        
+
         next(csv_reader, None)
-        
+
         for row in csv_reader:
             if row and row[0].strip():
                 nickname = row[0].strip()
                 if nickname not in allowed_users:
                     allowed_users.append(nickname)
                     added_count += 1
-        
+
         db.set("allowed_users", allowed_users)
         return RedirectResponse(url="/admin", status_code=302)
-    
+
     @app.get("/admin/users")
     async def get_users(admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
@@ -639,12 +637,12 @@ def setup_admin_routes(app):
     async def delete_user(nickname: str = Form(...), admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
             raise HTTPException(status_code=401, detail="권한이 없습니다")
-        
+
         allowed_users = db.get("allowed_users", [])
         if nickname in allowed_users:
             allowed_users.remove(nickname)
             db.set("allowed_users", allowed_users)
-            
+
             # 사용자 데이터도 함께 삭제
             user_keys = [
                 f"user:{nickname}:valid",
@@ -657,17 +655,17 @@ def setup_admin_routes(app):
                 f"user:{nickname}:payment_log",
                 f"user:{nickname}:last_activity_date"
             ]
-            
+
             for key in user_keys:
                 db.delete(key)
-        
+
         return RedirectResponse(url="/admin", status_code=302)
 
     @app.post("/admin/reset-user")
     async def reset_user(nickname: str = Form(...), admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
             raise HTTPException(status_code=401, detail="권한이 없습니다")
-        
+
         if nickname in db.get("allowed_users", []):
             # 사용자 진행도 초기화
             db.set(f"user:{nickname}:points", 5000)
@@ -678,21 +676,21 @@ def setup_admin_routes(app):
             db.set(f"user:{nickname}:video_progress", 0)
             db.set(f"user:{nickname}:payment_log", {})
             db.delete(f"user:{nickname}:last_activity_date")
-        
+
         return RedirectResponse(url="/admin", status_code=302)
 
     @app.get("/admin/detailed-analysis")
     async def get_detailed_analysis(admin_session: str = Cookie(None)):
         if admin_session != ADMIN_PASSWORD:
             raise HTTPException(status_code=401, detail="권한이 없습니다")
-        
+
         allowed_users = db.get("allowed_users", [])
         analysis_data = []
-        
+
         for day in range(1, 15):
             participants = []
             total_points = 0
-            
+
             for nickname in allowed_users:
                 if db.exists(f"user:{nickname}:valid"):
                     user_day = db.get(f"user:{nickname}:progression_day", 1)
@@ -700,12 +698,12 @@ def setup_admin_routes(app):
                         participants.append(nickname)
                         user_points = db.get(f"user:{nickname}:points", 0)
                         total_points += user_points
-            
+
             participant_count = len(participants)
             total_users = len([u for u in allowed_users if db.exists(f"user:{u}:valid")])
             completion_rate = round((participant_count / total_users * 100) if total_users > 0 else 0)
             avg_points = round(total_points / participant_count) if participant_count > 0 else 0
-            
+
             analysis_data.append({
                 "day": day,
                 "participants": participant_count,
@@ -713,6 +711,29 @@ def setup_admin_routes(app):
                 "avg_points": avg_points,
                 "total_points": total_points
             })
-        
+
         return analysis_data
 
+    @app.get("/admin/all-users")
+    async def get_all_users_admin(admin_session: str = Cookie(None)):
+        if admin_session != ADMIN_PASSWORD:
+            raise HTTPException(status_code=401, detail="권한이 없습니다")
+
+        # PostgreSQL에서 실제 참여한 사용자들만 조회
+        participated_users = db.get_all_users()
+        users_data = []
+
+        for nickname in participated_users:
+            user_data = {
+                "nickname": nickname,
+                "points": db.get(f"user:{nickname}:points", 0),
+                "progression_day": db.get(f"user:{nickname}:progression_day", 1),
+                "last_activity": db.get(f"user:{nickname}:last_activity_date", "없음"),
+                "payment_log": db.get(f"user:{nickname}:payment_log", {}),
+                "survey_responses": db.get(f"user:{nickname}:survey_responses", {}),
+                "viewed_cards": db.get(f"user:{nickname}:viewed_cards", []),
+                "video_progress": db.get(f"user:{nickname}:video_progress", 0)
+            }
+            users_data.append(user_data)
+
+        return users_data

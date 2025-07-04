@@ -1,37 +1,33 @@
-# setup_db.py
-import json
 
-DB_FILE = "db.json"
+#!/usr/bin/env python3
+# setup_db.py - PostgreSQL 초기화 스크립트
 
-# 초기 데이터 구조
-initial_data = {
-    # 1. 참여 자격이 있는 사전 인증된 사용자 목록
-    "allowed_users": [
-        "peter-a4t7",
-        "joy-b5g8",
-        "chris-c9h1",
-        "tester-01",
-        # [수정] 신규 테스트 유저 추가
-        "t001",
-        "t002",
-        "t003"
-    ],
-    # [수정] 테스트 유저 목록
-    "test_users": ["tester-01", "t001", "t002", "t003"],
-    # 2. '사회적 증거'를 위한 전역 통계 데이터 초기화
-    "global_stats": {
-        "participants": 0,
-        "total_points_awarded": 0,
-        "video_viewers": 0,
-        "card_finishers": 0
-    }
-}
+import database as db
 
-# db.json 파일 생성
-with open(DB_FILE, "w") as f:
-    json.dump(initial_data, f, indent=4)
+def main():
+    print("🔄 PostgreSQL 데이터베이스 초기화 중...")
+    
+    try:
+        # 데이터베이스 초기화
+        db.load_db()
+        
+        # 초기 데이터 확인
+        allowed_users = db.get("allowed_users", [])
+        test_users = db.get("test_users", [])
+        global_stats = db.get("global_stats", {})
+        
+        print(f"✅ PostgreSQL 데이터베이스가 성공적으로 초기화되었습니다.")
+        print(f"📝 허용된 사용자: {allowed_users}")
+        print(f"🧪 테스트 사용자: {test_users}")
+        print(f"📊 초기 통계: {global_stats}")
+        
+    except Exception as e:
+        print(f"❌ 초기화 실패: {e}")
+        print("💡 해결 방법:")
+        print("1. Replit에서 새 탭을 열고 'Database' 검색")
+        print("2. 'Create a database' 클릭")
+        print("3. PostgreSQL 선택")
+        print("4. 다시 이 스크립트를 실행해주세요.")
 
-print(f"✅ '{DB_FILE}' 파일이 성공적으로 생성되었습니다.")
-print(f"허용된 사용자: {initial_data['allowed_users']}")
-print(f"테스트 사용자: {initial_data['test_users']}")
-print(f"초기 통계: {initial_data['global_stats']}")
+if __name__ == "__main__":
+    main()
