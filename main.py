@@ -9,6 +9,7 @@ from fastapi import FastAPI, HTTPException, Request
 from starlette.responses import FileResponse
 from pydantic import BaseModel
 import database as db
+from admin import setup_admin_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -16,6 +17,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
+setup_admin_routes(app)
 
 class IdentifyRequest(BaseModel): nickname: str
 class SurveyRequest(BaseModel): userId: str; questionId: int; response: str
@@ -173,6 +175,39 @@ async def spend(req: SpendRequest):
         "points_awarded": points_awarded, "special_reward": special_reward,
         "total_points": total_points
     }
+
+@app.get("/admin/user/{nickname}")
+async def get_user_status(nickname: str):
+    if not db.exists(f"user:{nickname}:valid"):
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
+    
+    return {
+        "nickname": nickname,
+        "points": db.get(f"user:{nickname}:points", 0),
+        "progression_day": db.get(f"user:{nickname}:progression_day", 1),
+        "survey_step": db.get(f"user:{nickname}:survey_step", 0),
+        "viewed_cards": db.get(f"user:{nickname}:viewed_cards", []),
+        "video_progress": db.get(f"user:{nickname}:video_progress", 0),
+        "payment_log": db.get(f"user:{nickname}:payment_log", {}),
+        "last_activity": db.get(f"user:{nickname}:last_activity_date", "없음")
+    }
+
+@app.get("/admin/all-users")
+async def get_all_users():
+    allowed_users = db.get("allowed_users", [])
+    users_data = []
+    
+    for nickname in allowed_users:
+        if db.exists(f"user:{nickname}:valid"):
+            user_data = {
+                "nickname": nickname,
+                "points": db.get(f"user:{nickname}:points", 0),
+                "progression_day": db.get(f"user:{nickname}:progression_day", 1),
+                "last_activity": db.get(f"user:{nickname}:last_activity_date", "없음")
+            }
+            users_data.append(user_data)
+    
+    return users_data
 
 @app.post("/api/nextday")
 async def next_day(req: Request):
